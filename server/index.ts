@@ -2,6 +2,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { DatabaseManager } from './database/DatabaseManager.js';
 import { RoomManager } from './managers/RoomManager.js';
 import { WhiteboardManager } from './managers/WhiteboardManager.js';
@@ -12,6 +14,9 @@ import type {
   InterServerEvents, 
   SocketData 
 } from './types/socket.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
@@ -30,6 +35,11 @@ const io = new Server<
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the React app build
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+}
 
 // Initialize managers
 const dbManager = new DatabaseManager();
@@ -106,48 +116,48 @@ io.on('connection', (socket) => {
 
   // Drawing events
   socket.on('drawing-start', async (data) => {
-    const { roomId } = socket.data;
-    if (!roomId) return;
+    const { roomId, userId } = socket.data;
+    if (!roomId || !userId) return;
 
     // Save to database
     await whiteboardManager.addElement(roomId, data.element);
     
     // Broadcast to other users
-    socket.to(roomId).emit('drawing-start', data);
+    socket.to(roomId).emit('drawing-start', { element: data.element, userId });
   });
 
   socket.on('drawing-update', async (data) => {
-    const { roomId } = socket.data;
-    if (!roomId) return;
+    const { roomId, userId } = socket.data;
+    if (!roomId || !userId) return;
 
     // Update in database
     await whiteboardManager.updateElement(roomId, data.element);
     
     // Broadcast to other users
-    socket.to(roomId).emit('drawing-update', data);
+    socket.to(roomId).emit('drawing-update', { element: data.element, userId });
   });
 
   socket.on('drawing-end', async (data) => {
-    const { roomId } = socket.data;
-    if (!roomId) return;
+    const { roomId, userId } = socket.data;
+    if (!roomId || !userId) return;
 
     // Final update in database
     await whiteboardManager.updateElement(roomId, data.element);
     
     // Broadcast to other users
-    socket.to(roomId).emit('drawing-end', data);
+    socket.to(roomId).emit('drawing-end', { element: data.element, userId });
   });
 
   // Text addition
   socket.on('text-added', async (data) => {
-    const { roomId } = socket.data;
-    if (!roomId) return;
+    const { roomId, userId } = socket.data;
+    if (!roomId || !userId) return;
 
     // Save to database
     await whiteboardManager.addElement(roomId, data.element);
     
     // Broadcast to other users
-    socket.to(roomId).emit('text-added', data);
+    socket.to(roomId).emit('text-added', { element: data.element, userId });
   });
 
   // Clear canvas
@@ -236,6 +246,13 @@ app.get('/api/rooms/:roomId', async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to get room' });
   }
 });
+
+// Catch all handler: send back React's index.html file for any non-API routes
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
