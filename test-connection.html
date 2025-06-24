@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    
+    <div class="test">
+        <h3>Health Check</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Socket.IO Connection</h3>
+        <button onclick="testSocket()">Test Socket Connection</button>
+        <div id="socket-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Create Room Test</h3>
+        <button onclick="testCreateRoom()">Test Create Room</button>
+        <div id="room-result"></div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const backendUrl = isProduction 
+            ? 'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com'
+            : 'http://localhost:3001';
+        
+        console.log('Testing connection to:', backendUrl);
+        
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            try {
+                const response = await fetch(`${backendUrl}/api/health`);
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="success">✅ Success: ${JSON.stringify(data)}</div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testSocket() {
+            const resultDiv = document.getElementById('socket-result');
+            try {
+                const socket = io(backendUrl);
+                
+                socket.on('connect', () => {
+                    resultDiv.innerHTML = `<div class="success">✅ Socket connected! ID: ${socket.id}</div>`;
+                    socket.disconnect();
+                });
+                
+                socket.on('connect_error', (error) => {
+                    resultDiv.innerHTML = `<div class="error">❌ Socket connection failed: ${error.message}</div>`;
+                });
+                
+                setTimeout(() => {
+                    if (!socket.connected) {
+                        resultDiv.innerHTML = `<div class="error">❌ Socket connection timeout</div>`;
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Socket error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testCreateRoom() {
+            const resultDiv = document.getElementById('room-result');
+            try {
+                const response = await fetch(`${backendUrl}/api/rooms`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Room',
+                        isPrivate: false,
+                        permissions: 'edit'
+                    }),
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ Room created! ID: ${data.room.id}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Failed to create room: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 
