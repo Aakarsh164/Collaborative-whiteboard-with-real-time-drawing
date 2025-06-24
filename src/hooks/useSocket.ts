@@ -15,7 +15,13 @@ export const useSocket = () => {
 
   useEffect(() => {
     // Connect to server
-    const socket = io('http://localhost:3001');
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const socketUrl = isProduction 
+      ? 'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com'
+      : 'http://localhost:3001';
+      
+    console.log('Connecting to:', socketUrl);
+    const socket = io(socketUrl);
     socketRef.current = socket;
 
     socket.on('connect', () => {

@@ -19,7 +19,13 @@ function App() {
   const handleCreateRoom = useCallback(async (roomData: Omit<Room, 'id' | 'createdAt' | 'users'>) => {
     try {
       // Create room via API
-      const response = await fetch('http://localhost:3001/api/rooms', {
+      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      const apiUrl = isProduction 
+        ? 'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com/api/rooms'
+        : 'http://localhost:3001/api/rooms';
+        
+      console.log('Creating room via:', apiUrl);
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
