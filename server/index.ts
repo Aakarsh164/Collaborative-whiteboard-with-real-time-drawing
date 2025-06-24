@@ -62,7 +62,10 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from the React app build
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
+  // On Render, the dist folder is in the project root
+  const staticPath = path.join(__dirname, '../../dist');
+  console.log('Serving static files from:', staticPath);
+  app.use(express.static(staticPath));
 }
 
 // Initialize managers
@@ -274,7 +277,9 @@ app.get('/api/rooms/:roomId', async (req, res) => {
 // Catch all handler: send back React's index.html file for any non-API routes
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
+    const indexPath = path.join(__dirname, '../../dist/index.html');
+    console.log('Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
   });
 }
 
