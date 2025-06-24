@@ -1,0 +1,3 @@
+[33mba14dfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix CORS to allow all frontend URLs
+[33m9083c84[m[33m ([m[1;31mwhiteboardremote/main[m[33m, [m[1;31mwhiteboardremote/HEAD[m[33m)[m Update CORS config to allow all frontend origins
+[33mef3e987[m Add better error handling and logging for room creation
