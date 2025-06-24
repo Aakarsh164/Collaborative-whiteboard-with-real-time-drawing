@@ -27,10 +27,15 @@ const io = new Server<
   SocketData
 >(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://collaborative-whiteboard-with-real-three.vercel.app']
-      : ['http://localhost:5173'],
-    methods: ['GET', 'POST']
+    origin: [
+      'https://collaborative-whiteboard-with-real-three.vercel.app',
+      'https://collaborative-whiteboard-with-real-rho.vercel.app',
+      'https://collaborative-whiteboard-with-real-time-6jj8.onrender.com',
+      'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com',
+      'http://localhost:5173'
+    ],
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
