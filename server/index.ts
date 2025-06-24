@@ -245,17 +245,26 @@ async function handleUserLeave(socket: any, roomId: string, userId: string) {
 // REST API endpoints
 app.post('/api/rooms', async (req, res) => {
   try {
+    console.log('Creating room with data:', req.body);
     const { name, isPrivate, password, permissions } = req.body;
+    
+    if (!name) {
+      console.error('Room name is required');
+      return res.status(400).json({ success: false, error: 'Room name is required' });
+    }
+    
     const room = await roomManager.createRoom({
       name,
       isPrivate: isPrivate || false,
       password: isPrivate ? password : undefined,
       permissions: permissions || 'edit'
     });
+    
+    console.log('Room created successfully:', room);
     res.json({ success: true, room });
   } catch (error) {
     console.error('Error creating room:', error);
-    res.status(500).json({ success: false, error: 'Failed to create room' });
+    res.status(500).json({ success: false, error: 'Failed to create room: ' + error.message });
   }
 });
 

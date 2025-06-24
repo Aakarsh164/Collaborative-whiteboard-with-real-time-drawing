@@ -25,6 +25,8 @@ function App() {
         : 'http://localhost:3001/api/rooms';
         
       console.log('Creating room via:', apiUrl);
+      console.log('Room data:', roomData);
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -33,8 +35,14 @@ function App() {
         body: JSON.stringify(roomData),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       const result = await response.json();
+      console.log('Response data:', result);
+      
       if (!result.success) {
+        console.error('API Error:', result.error);
         alert('Failed to create room: ' + result.error);
         return;
       }
