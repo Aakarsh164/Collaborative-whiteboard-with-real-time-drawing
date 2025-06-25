@@ -18,7 +18,6 @@ function App() {
 
   const handleCreateRoom = useCallback(async (roomData: Omit<Room, 'id' | 'createdAt' | 'users'>) => {
     try {
-      // Create room via API
       const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
       const apiUrl = isProduction 
         ? 'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com/api/rooms'
@@ -49,8 +48,6 @@ function App() {
 
       const room = result.room;
       const userName = 'User ' + Math.floor(Math.random() * 1000);
-
-      // Join the room via socket
       const joinResult = await whiteboard.socket.joinRoom(room.id, userName, roomData.password);
       if (!joinResult.success) {
         alert('Failed to join room: ' + joinResult.error);
@@ -60,13 +57,9 @@ function App() {
       setCurrentRoom(joinResult.room!);
       setCurrentUser(joinResult.user!);
       setShowRoomManager(false);
-
-      // Load existing elements
       if (joinResult.elements) {
         whiteboard.loadElements(joinResult.elements);
       }
-
-      // Update URL with room ID
       window.history.pushState({}, '', `?room=${room.id}`);
     } catch (error) {
       console.error('Error creating room:', error);
@@ -78,8 +71,6 @@ function App() {
     try {
       console.log('Attempting to join room:', roomId);
       const userName = 'User ' + Math.floor(Math.random() * 1000);
-      
-      // Join the room via socket
       const joinResult = await whiteboard.socket.joinRoom(roomId, userName, password);
       console.log('Join room result:', joinResult);
       
@@ -93,14 +84,10 @@ function App() {
       setCurrentRoom(joinResult.room!);
       setCurrentUser(joinResult.user!);
       setShowRoomManager(false);
-
-      // Load existing elements
       if (joinResult.elements) {
         console.log('Loading existing elements:', joinResult.elements.length);
         whiteboard.loadElements(joinResult.elements);
       }
-
-      // Update URL with room ID
       window.history.pushState({}, '', `?room=${roomId}`);
     } catch (error) {
       console.error('Error joining room:', error);

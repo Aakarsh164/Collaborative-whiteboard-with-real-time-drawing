@@ -14,7 +14,7 @@ export const useSocket = () => {
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 
   useEffect(() => {
-    // Connect to server
+
     const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
     const socketUrl = isProduction 
       ? 'https://collaborative-whiteboard-with-real-time-8zp4.onrender.com'
