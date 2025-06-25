@@ -35,8 +35,6 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
       password: isPrivate ? password : undefined,
       permissions,
     });
-
-    // Reset form
     setRoomName('');
     setPassword('');
     setIsPrivate(false);
@@ -58,7 +56,6 @@ export const RoomManager: React.FC<RoomManagerProps> = ({
   };
 
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
