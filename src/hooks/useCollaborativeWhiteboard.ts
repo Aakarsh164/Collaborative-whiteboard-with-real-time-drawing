@@ -19,8 +19,6 @@ export const useCollaborativeWhiteboard = () => {
   const currentPath = useRef<DrawingPath | null>(null);
   const currentShape = useRef<Shape | null>(null);
   const socket = useSocket();
-
-  // Set up socket event listeners
   useEffect(() => {
     const unsubscribeDrawingStart = socket.onDrawingStart(({ element }) => {
       setState(prev => ({
@@ -98,8 +96,6 @@ export const useCollaborativeWhiteboard = () => {
         strokeWidth: state.strokeWidth,
         timestamp: Date.now(),
       };
-
-      // Emit to other users
       socket.emitDrawingStart(currentPath.current);
     } else if (state.currentTool === 'rectangle' || state.currentTool === 'circle') {
       currentShape.current = {
@@ -112,8 +108,6 @@ export const useCollaborativeWhiteboard = () => {
         filled: false,
         timestamp: Date.now(),
       };
-
-      // Emit to other users
       socket.emitDrawingStart(currentShape.current);
     }
   }, [state.currentTool, state.currentColor, state.strokeWidth, socket]);
@@ -133,8 +127,6 @@ export const useCollaborativeWhiteboard = () => {
           elementToModify
         ]
       }));
-
-      // Emit update to other users
       socket.emitDrawingUpdate(elementToModify);
     } else if (state.currentTool === 'rectangle' || state.currentTool === 'circle') {
       const elementToModify = currentShape.current;
@@ -148,8 +140,6 @@ export const useCollaborativeWhiteboard = () => {
           elementToModify
         ]
       }));
-
-      // Emit update to other users
       socket.emitDrawingUpdate(elementToModify);
     }
   }, [state.isDrawing, state.currentTool, socket]);
@@ -157,8 +147,6 @@ export const useCollaborativeWhiteboard = () => {
   const stopDrawing = useCallback(() => {
     if (state.isDrawing) {
       setState(prev => ({ ...prev, isDrawing: false }));
-      
-      // Emit final state to other users
       if (currentPath.current) {
         socket.emitDrawingEnd(currentPath.current);
       } else if (currentShape.current) {
@@ -184,8 +172,6 @@ export const useCollaborativeWhiteboard = () => {
     const newElements = [...state.elements, textElement];
     setState(prev => ({ ...prev, elements: newElements }));
     saveToHistory(newElements);
-
-    // Emit to other users
     socket.emitTextAdded(textElement);
   }, [state.elements, state.currentColor, state.fontSize, saveToHistory, socket]);
 
@@ -198,8 +184,6 @@ export const useCollaborativeWhiteboard = () => {
   const clearCanvas = useCallback(() => {
     setState(prev => ({ ...prev, elements: [], selectedElement: null }));
     saveToHistory([]);
-    
-    // Emit to other users
     socket.emitClearCanvas();
   }, [saveToHistory, socket]);
 
