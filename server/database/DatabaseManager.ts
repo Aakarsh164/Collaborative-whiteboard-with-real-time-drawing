@@ -7,12 +7,17 @@ export class DatabaseManager {
 
   async initialize() {
     return new Promise<void>((resolve, reject) => {
-      this.db = new sqlite3.Database(':memory:', (err) => {
+      // Use a persistent database file instead of in-memory
+      const dbPath = process.env.NODE_ENV === 'production' 
+        ? '/tmp/whiteboard.db'  // Render provides /tmp directory
+        : './whiteboard.db';    // Local development
+      
+      this.db = new sqlite3.Database(dbPath, (err) => {
         if (err) {
           reject(err);
           return;
         }
-        console.log('Connected to SQLite database');
+        console.log('Connected to SQLite database at:', dbPath);
         this.createTables().then(resolve).catch(reject);
       });
     });
