@@ -17,13 +17,10 @@ export class DatabaseManager {
       });
     });
   }
-
   private async createTables() {
     if (!this.db) throw new Error('Database not initialized');
 
-    const run = promisify(this.db.run.bind(this.db));
-
-    // Rooms table
+    const run = promisify(this.db.run.bind(this.db)); 
     await run(`
       CREATE TABLE IF NOT EXISTS rooms (
         id TEXT PRIMARY KEY,
@@ -34,8 +31,6 @@ export class DatabaseManager {
         createdAt INTEGER NOT NULL
       )
     `);
-
-    // Users table
     await run(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -46,7 +41,7 @@ export class DatabaseManager {
       )
     `);
 
-    // Room users junction table
+ 
     await run(`
       CREATE TABLE IF NOT EXISTS room_users (
         roomId TEXT NOT NULL,
@@ -57,8 +52,6 @@ export class DatabaseManager {
         FOREIGN KEY (userId) REFERENCES users(id)
       )
     `);
-
-    // Whiteboard elements table
     await run(`
       CREATE TABLE IF NOT EXISTS whiteboard_elements (
         id TEXT PRIMARY KEY,
@@ -107,8 +100,6 @@ export class DatabaseManager {
     ) as any;
 
     if (!room) return null;
-
-    // Get users in room
     const users = await all(`
       SELECT u.* FROM users u
       JOIN room_users ru ON u.id = ru.userId
