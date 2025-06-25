@@ -1,113 +1,113 @@
 # Collaborative Whiteboard
 
-A real-time collaborative whiteboard application built with React, TypeScript, Socket.IO, and SQLite.
+A real-time collaborative whiteboard application built with React, TypeScript, Socket.IO, and Node.js.
 
 ## Features
 
 - Real-time collaborative drawing
-- Multiple drawing tools (pen, eraser, shapes, text)
-- Room-based collaboration with password protection
-- Live cursor tracking
-- Export functionality (PDF, PNG)
+- Multiple drawing tools (pen, rectangle, circle, text)
+- Room-based collaboration
+- User cursors and presence
+- Export to PDF
 - Responsive design
 
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS
-- **Backend**: Node.js, Express, Socket.IO
-- **Database**: SQLite
-- **Real-time Communication**: Socket.IO
+- **Backend**: Node.js, Express, Socket.IO, TypeScript
+- **Database**: PostgreSQL (production) / SQLite (development)
+- **Deployment**: Vercel (frontend), Render (backend)
 
-## Local Development
+## Setup
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js 18+
 - npm or yarn
 
-### Setup
+### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd collaborative-whiteboard
-```
-
+1. Clone the repository
 2. Install dependencies:
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-3. Start the development server:
-```bash
-npm run dev
-```
+3. Set up environment variables:
+   - Create a `.env` file in the root directory
+   - Add the following variables:
+     ```
+     NODE_ENV=development
+     # For production, set DATABASE_URL in your deployment platform
+     ```
 
-This will start both the client (Vite dev server) and the backend server concurrently.
+### Database Setup
 
-- Client: http://localhost:5173
-- Server: http://localhost:3001
+The application uses:
+- **PostgreSQL** in production (when `DATABASE_URL` is set)
+- **SQLite** in development (in-memory database)
 
-## Production Deployment
+For production deployment on Render:
+1. Create a PostgreSQL database in your Render dashboard
+2. Set the `DATABASE_URL` environment variable in your service settings
+3. The application will automatically create the required tables
 
-### Render Deployment
+### Development
 
-This project is configured for easy deployment on Render:
+1. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
+2. Start the backend server:
+   ```bash
+   npm run server:dev
+   ```
+
+3. Open http://localhost:5173 in your browser
+
+### Production Deployment
+
+#### Frontend (Vercel)
+1. Connect your GitHub repository to Vercel
+2. Deploy automatically on push to main branch
+
+#### Backend (Render)
 1. Connect your GitHub repository to Render
-2. Create a new Web Service
-3. Use the following settings:
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-   - **Environment Variable**: `NODE_ENV=production`
+2. Set environment variables:
+   - `DATABASE_URL`: Your PostgreSQL connection string
+   - `NODE_ENV`: production
+3. Deploy automatically on push to main branch
 
-The `render.yaml` file is included for automatic configuration.
+## Usage
 
-### Manual Deployment
-
-1. Build the application:
-```bash
-npm run build
-```
-
-2. Start the production server:
-```bash
-npm start
-```
-
-The server will serve the built React app and handle API requests on the same port.
+1. Create a new room or join an existing one
+2. Start drawing with the toolbar tools
+3. Share the room URL with others to collaborate
+4. Export your work as PDF when finished
 
 ## Project Structure
 
 ```
-├── src/                    # React frontend
-│   ├── components/         # React components
-│   ├── hooks/             # Custom React hooks
-│   ├── types/             # TypeScript type definitions
-│   └── utils/             # Utility functions
-├── server/                # Express backend
-│   ├── database/          # Database management
-│   ├── managers/          # Business logic managers
-│   └── types/             # Server type definitions
-├── dist/                  # Built files (generated)
-└── package.json           # Dependencies and scripts
+project/
+├── src/                 # Frontend React application
+│   ├── components/      # React components
+│   ├── hooks/          # Custom React hooks
+│   ├── types/          # TypeScript type definitions
+│   └── utils/          # Utility functions
+├── server/             # Backend Node.js application
+│   ├── database/       # Database management
+│   ├── managers/       # Business logic managers
+│   └── types/          # TypeScript type definitions
+└── package.json        # Dependencies and scripts
 ```
-
-## Available Scripts
-
-- `npm run dev` - Start development server (client + server)
-- `npm run dev:client` - Start only the client dev server
-- `npm run dev:server` - Start only the server dev server
-- `npm run build` - Build both client and server for production
-- `npm run build:client` - Build only the client
-- `npm run build:server` - Build only the server
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
 
 ## Environment Variables
 
-- `NODE_ENV` - Set to `production` for production deployment
-- `PORT` - Server port (defaults to 3001)
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Production only |
+| `NODE_ENV` | Environment (development/production) | Yes |
 
 ## License
 

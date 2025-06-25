@@ -4,10 +4,15 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
 import { DatabaseManager } from './database/DatabaseManager.js';
 import { RoomManager } from './managers/RoomManager.js';
-import { WhiteboardManager } from './managers/WhiteboardManager.js';
 import { AuthManager } from './managers/AuthManager.js';
+import { WhiteboardManager } from './managers/WhiteboardManager.js';
 import type { 
   ClientToServerEvents, 
   ServerToClientEvents, 
