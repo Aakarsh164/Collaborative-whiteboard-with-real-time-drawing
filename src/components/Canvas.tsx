@@ -109,11 +109,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid background
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = '#f1f5f9';
     ctx.lineWidth = 1;
@@ -132,8 +128,6 @@ export const Canvas: React.FC<CanvasProps> = ({
       ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
-
-    // Draw all elements
     elements.forEach((element) => {
       if ('points' in element) {
         drawPath(ctx, element as DrawingPath);
@@ -179,8 +173,6 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   const handleMouseMove = useCallback((event: React.MouseEvent) => {
     const point = getPointFromEvent(event);
-    
-    // Emit cursor position for collaboration
     onCursorMove?.(point);
     
     if (isDrawing) {
