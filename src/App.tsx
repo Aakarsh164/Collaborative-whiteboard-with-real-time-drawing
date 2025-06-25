@@ -76,21 +76,27 @@ function App() {
 
   const handleJoinRoom = useCallback(async (roomId: string, password?: string) => {
     try {
+      console.log('Attempting to join room:', roomId);
       const userName = 'User ' + Math.floor(Math.random() * 1000);
       
       // Join the room via socket
       const joinResult = await whiteboard.socket.joinRoom(roomId, userName, password);
+      console.log('Join room result:', joinResult);
+      
       if (!joinResult.success) {
+        console.error('Failed to join room:', joinResult.error);
         alert('Failed to join room: ' + joinResult.error);
         return;
       }
 
+      console.log('Successfully joined room:', joinResult.room);
       setCurrentRoom(joinResult.room!);
       setCurrentUser(joinResult.user!);
       setShowRoomManager(false);
 
       // Load existing elements
       if (joinResult.elements) {
+        console.log('Loading existing elements:', joinResult.elements.length);
         whiteboard.loadElements(joinResult.elements);
       }
 
@@ -98,7 +104,7 @@ function App() {
       window.history.pushState({}, '', `?room=${roomId}`);
     } catch (error) {
       console.error('Error joining room:', error);
-      alert('Failed to join room');
+      alert('Failed to join room: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [whiteboard]);
 
@@ -118,10 +124,29 @@ function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('room');
+    
     if (roomId && !currentRoom) {
-      handleJoinRoom(roomId);
+      console.log('Found room ID in URL:', roomId);
+      
+      // Wait for socket to be connected before joining
+      if (whiteboard.socket.connected) {
+        console.log('Socket connected, joining room...');
+        handleJoinRoom(roomId);
+      } else {
+        console.log('Socket not connected yet, waiting...');
+        // Wait for socket connection
+        const checkConnection = () => {
+          if (whiteboard.socket.connected) {
+            console.log('Socket now connected, joining room...');
+            handleJoinRoom(roomId);
+          } else {
+            setTimeout(checkConnection, 100);
+          }
+        };
+        checkConnection();
+      }
     }
-  }, [currentRoom, handleJoinRoom]);
+  }, [currentRoom, handleJoinRoom, whiteboard.socket.connected]);
 
   // Show room manager if not connected
   useEffect(() => {
